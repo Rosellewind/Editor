@@ -7,8 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4A665620180363D90015B494 /* Buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4A66561E180363D90015B494 /* Buffer.cpp */; };
+		4A6656231803AE330015B494 /* CommandSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4A6656211803AE330015B494 /* CommandSet.cpp */; };
 		4AC1888D17FE149400C54B07 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4AC1888C17FE149400C54B07 /* main.cpp */; };
 		4AC1888F17FE149400C54B07 /* Editor.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4AC1888E17FE149400C54B07 /* Editor.1 */; };
+		4AC1889617FE1E7700C54B07 /* libcurses.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AC1889517FE1E7700C54B07 /* libcurses.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,9 +28,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4A66561E180363D90015B494 /* Buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Buffer.cpp; sourceTree = "<group>"; };
+		4A66561F180363D90015B494 /* Buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Buffer.h; sourceTree = "<group>"; };
+		4A6656211803AE330015B494 /* CommandSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandSet.cpp; sourceTree = "<group>"; };
+		4A6656221803AE330015B494 /* CommandSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandSet.h; sourceTree = "<group>"; };
 		4AC1888917FE149400C54B07 /* Editor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Editor; sourceTree = BUILT_PRODUCTS_DIR; };
 		4AC1888C17FE149400C54B07 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4AC1888E17FE149400C54B07 /* Editor.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Editor.1; sourceTree = "<group>"; };
+		4AC1889517FE1E7700C54B07 /* libcurses.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcurses.dylib; path = usr/lib/libcurses.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4AC1889617FE1E7700C54B07 /* libcurses.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +53,7 @@
 		4AC1888017FE149400C54B07 = {
 			isa = PBXGroup;
 			children = (
+				4AC1889517FE1E7700C54B07 /* libcurses.dylib */,
 				4AC1888B17FE149400C54B07 /* Editor */,
 				4AC1888A17FE149400C54B07 /* Products */,
 			);
@@ -61,6 +71,10 @@
 			isa = PBXGroup;
 			children = (
 				4AC1888C17FE149400C54B07 /* main.cpp */,
+				4A66561F180363D90015B494 /* Buffer.h */,
+				4A66561E180363D90015B494 /* Buffer.cpp */,
+				4A6656211803AE330015B494 /* CommandSet.cpp */,
+				4A6656221803AE330015B494 /* CommandSet.h */,
 				4AC1888E17FE149400C54B07 /* Editor.1 */,
 			);
 			path = Editor;
@@ -76,6 +90,7 @@
 				4AC1888517FE149400C54B07 /* Sources */,
 				4AC1888617FE149400C54B07 /* Frameworks */,
 				4AC1888717FE149400C54B07 /* CopyFiles */,
+				4AC1889717FE2DEC00C54B07 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -112,12 +127,30 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		4AC1889717FE2DEC00C54B07 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "open ${TARGET_BUILD_DIR}/${TARGET_NAME}";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		4AC1888517FE149400C54B07 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				4AC1888D17FE149400C54B07 /* main.cpp in Sources */,
+				4A665620180363D90015B494 /* Buffer.cpp in Sources */,
+				4A6656231803AE330015B494 /* CommandSet.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,6 +260,7 @@
 				4AC1889417FE149400C54B07 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
