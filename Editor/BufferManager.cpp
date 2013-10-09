@@ -11,7 +11,7 @@
 
 
 BufferManager::BufferManager(){
-    point = gapL = gapR = end = overstrike = 0;
+    point = gapL = gapR = end = overstrike = usingEndMarker = 0;
     buffer = createBuffer();
 }
 
@@ -29,20 +29,30 @@ char* BufferManager::createBuffer(){
 }
 
 void BufferManager::setPointA(int location){                //set the point to location
-    point = location;
+    point = location;////////////
     bool pastTheGap = (point > gapL);                       //adjust if crosses the gap
     if (pastTheGap) point += gapSize();
 }
 
 void BufferManager::setPointR(int count){                   //set the point relative
     int total = point + count;
-    bool crossesTheGap = ((point <= gapL && total > gapL) ||//adjust if crosses the gap
-                          (point >= gapR && total < gapR));
-    point += count;
+    bool crossesTheGap = false;
+    if (point == gapL || point == gapL - 1)
+        crossesTheGap = (count > 0);
+    else if (point == gapR)
+        crossesTheGap = (count < 0);
+    else if((point < gapL && total >= gapR)||
+         (point > gapR && total < gapL))
+        crossesTheGap = true;
     if (crossesTheGap) {
-        if (count < 0) point -= (gapSize() - 1);
-        else point += gapSize() - 1;
+        if (count < 0) point -= gapSize();
+        else{
+            if (point == gapL)
+                point += gapSize();
+            else point += gapSize();
+        }
     }
+    point += count;
 }
 
 int BufferManager::getPoint(){
@@ -54,9 +64,10 @@ void BufferManager::addToTheGap(){                             //add to the gap 
     int count = 2000;
     if (count + end > MAX)
         cout<<"reached max characters"<<endl;
-    int numToMove = end - gapL;
+    int numToMove = end - gapR;///////gapL
+    
     for (int i = 0; i < numToMove; i++) {
-        buffer[end - i] = buffer[end - i - 1];
+        buffer[end + count - i - 1] = buffer[end - i - 1];
     }
     end += count;
     gapR += count;
@@ -67,42 +78,52 @@ int BufferManager::gapSize(){
 }
 void BufferManager::shiftGap(int count, bool toTheLeft){       //shift gap
     if (toTheLeft)
-        for (int i = 0; i < count; i++) {
-            gapR--; gapL--;
-            buffer[gapR] = buffer[gapL];
+        if (gapL == gapR) {
+            gapR = gapL = point;
+        }
+        else{
+            for (int i = 0; i < count; i++) {
+                gapR--; gapL--;
+                buffer[gapR] = buffer[gapL];////////
+            }
         }
     else
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {/////+1ck
             buffer[gapL] = buffer[gapR];
             gapR++; gapL++;
         }
+    point = gapL;
 }
 
 void BufferManager::checkGap(){
     if (point > end) point = end;
+    if (point == end) usingEndMarker = true;
+    else usingEndMarker = false;
     if (point != gapL && point != gapR) {               //shift the gap if needed
-        bool toTheLeft = (point < gapL);                //determine if point is to the left or right of the gap
-        int count = toTheLeft ? gapL-point : point-gapR;//how many to shift
-        shiftGap(count, toTheLeft);
+        if (gapL == gapR) {
+            gapR = gapL = point;
+        }
+        else {
+            bool toTheLeft = (point < gapL);                //determine if point is to the left or right of the gap
+            int count = toTheLeft ? gapL-point: point-gapR;//how many to shift
+            shiftGap(count, toTheLeft);
+        }
     }
 }
 
 void BufferManager::insert(string str){
-    if (gapSize() < str.length()) addToTheGap();
     checkGap();                                         //check the gap
-    
-    bool toTheLeft = (point == gapL);
-    if (toTheLeft)                                      //if point is to the left
-        for (int i = 0; i < str.length(); i++) {            //insert char and update
-            buffer[point] = str[i];
-            point++; gapL++;
+    if (!usingEndMarker && gapSize() < str.length()) addToTheGap();
+    for (int i = 0; i < str.length(); i++) {            //insert char and update
+        buffer[point] = str[i];
+        point++;
+        if (usingEndMarker) {
+            if (end == gapL)
+                gapL++; gapR++;
+            end++;
         }
-    else                                                //if point is to the right
-        for (int i = (int)str.length()-1; i >=0; i--) { //insert char and update
-            buffer[point] = str[i];
-            point--; gapR--;
-        }
-    
+        else gapL++;
+    }
 }
 
 void BufferManager::myDelete(int count){
@@ -131,7 +152,7 @@ string BufferManager::rightString(){
 
 string BufferManager::varString(){
     string str = "point:" + intToString(point) + "   gapL:" + intToString(gapL) +
-    "   gapR:" + intToString(gapR) + "   end:" + intToString(end) + "   gapSize:" + intToString(gapSize());
+    " gapR:" + intToString(gapR) + " end:" + intToString(end) + " gapSize:" + intToString(gapSize()) + " atPoint:" + intToString(buffer[point]);
     return str;
 }
 
@@ -143,7 +164,7 @@ int BufferManager::getLine(int cols){
 
 int BufferManager::getCol(int cols){
     bool pastTheGap = (point > gapL);           //adjust if crosses the gap
-    if (pastTheGap) return (point - gapSize() + 1) % cols;
+    if (pastTheGap) return (point - gapSize() ) % cols;
     else return point % cols;
 }
 

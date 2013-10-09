@@ -28,6 +28,7 @@ class BufferManager{
     void addToTheGap();
     char *buffer;
     bool overstrike;
+    bool usingEndMarker;
     
 public:
     BufferManager();
