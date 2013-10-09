@@ -1,13 +1,13 @@
 //
-//  Buffer.h
+//  BufferManager.h
 //  Editor
 //
-//  Created by Roselle Milvich on 10/7/13.
+//  Created by Roselle Milvich on 10/8/13.
 //  Copyright (c) 2013 Roselle Milvich. All rights reserved.
 //
 
-#ifndef __Editor__Buffer__
-#define __Editor__Buffer__
+#ifndef __Editor__BufferManager__
+#define __Editor__BufferManager__
 
 #include <iostream>
 #include <string>
@@ -15,7 +15,7 @@
 
 using namespace std;
 
-class Buffer{
+class BufferManager{
     int point;
     int gapL;
     int gapR;
@@ -26,20 +26,22 @@ class Buffer{
     int gapSize();
     void shiftGap(int count, bool toTheLeft);
     void addToTheGap();
+    char *buffer;
+    bool overstrike;
     
 public:
-    char *buffer;/////////
-    Buffer();
+    BufferManager();
+    string intToString(int i);
     void setPointA(int index);
     void setPointR(int count);
     int getPoint();
     void insert(string str);
     void myDelete(int count);
     void searchF();
-    ~Buffer();
+    string leftString();
+    string rightString();
+    string varString();
+    int getLine(int cols);
+    int getCol(int cols);
 };
-
-
-
-
-#endif /* defined(__Editor__Buffer__) */
+#endif /* defined(__Editor__BufferManager__) */

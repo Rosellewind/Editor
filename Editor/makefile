@@ -1,3 +1,3 @@
 all:
-	g++ -o edit main.cpp Buffer.cpp -lcurses
+	g++ -o edit main.cpp BufferManager.cpp -lcurses
 	
