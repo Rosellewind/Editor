@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4A665626180492F30015B494 /* BufferManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4A665624180492F30015B494 /* BufferManager.cpp */; };
+		4AAAFDB7180641B700175036 /* libncurses.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AAAFDB6180641B700175036 /* libncurses.dylib */; };
 		4AC1888D17FE149400C54B07 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4AC1888C17FE149400C54B07 /* main.cpp */; };
 		4AC1888F17FE149400C54B07 /* Editor.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4AC1888E17FE149400C54B07 /* Editor.1 */; };
 		4AC1889617FE1E7700C54B07 /* libcurses.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AC1889517FE1E7700C54B07 /* libcurses.dylib */; };
@@ -29,6 +30,7 @@
 /* Begin PBXFileReference section */
 		4A665624180492F30015B494 /* BufferManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BufferManager.cpp; sourceTree = "<group>"; };
 		4A665625180492F30015B494 /* BufferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BufferManager.h; sourceTree = "<group>"; };
+		4AAAFDB6180641B700175036 /* libncurses.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libncurses.dylib; path = usr/lib/libncurses.dylib; sourceTree = SDKROOT; };
 		4AC1888917FE149400C54B07 /* Editor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Editor; sourceTree = BUILT_PRODUCTS_DIR; };
 		4AC1888C17FE149400C54B07 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4AC1888E17FE149400C54B07 /* Editor.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Editor.1; sourceTree = "<group>"; };
@@ -40,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4AAAFDB7180641B700175036 /* libncurses.dylib in Frameworks */,
 				4AC1889617FE1E7700C54B07 /* libcurses.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -50,6 +53,7 @@
 		4AC1888017FE149400C54B07 = {
 			isa = PBXGroup;
 			children = (
+				4AAAFDB6180641B700175036 /* libncurses.dylib */,
 				4AC1889517FE1E7700C54B07 /* libcurses.dylib */,
 				4AC1888B17FE149400C54B07 /* Editor */,
 				4AC1888A17FE149400C54B07 /* Products */,

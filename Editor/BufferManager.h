@@ -15,20 +15,30 @@
 
 using namespace std;
 
+struct position {
+    int x;
+    int y;
+};
+
 class BufferManager{
+    static const int MAX_DOCUMENT_LENGTH = INT32_MAX;
+    static const int GAP_BLOCK_SIZE = 2000;
+    char *buffer;
     int point;
     int gapL;
     int gapR;
     int end;
-    static const int MAX = INT32_MAX;
-    char* createBuffer();
-    void checkGap();
-    int gapSize();
-    void shiftGap(int count, bool toTheLeft);
-    void addToTheGap();
-    char *buffer;
     bool overstrike;
     bool usingEndMarker;
+    
+    char* createBuffer();
+    bool crossesTheGap(int count);
+    int crossesCarriageReturn(int count);
+    void addToTheGap();
+    int gapSize();
+    void shiftGap(int count, bool toTheLeft);
+    void checkGap();
+
     
 public:
     BufferManager();
@@ -42,6 +52,7 @@ public:
     string leftString();
     string rightString();
     string varString();
+    position getPosition(int cols, int rows);
     int getLine(int cols);
     int getCol(int cols);
 };
