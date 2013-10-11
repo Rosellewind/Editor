@@ -46,6 +46,7 @@ public:
     void setPointA(int index);
     void setPointR(int count);
     int getPoint();
+    bool pointIsAtEnd();
     void insert(string str);
     void myDelete(int count);
     void searchF();

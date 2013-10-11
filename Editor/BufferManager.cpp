@@ -8,7 +8,7 @@
 
 #include "BufferManager.h"
 #include <sstream>
-
+#include <math.h>
 //private methods
 
 char* BufferManager::createBuffer(){
@@ -105,23 +105,30 @@ string BufferManager::intToString(int i){
 }
 
 void BufferManager::setPointA(int location){                //set the point to location
-    point = location;
+    point = location;//////////
     bool pastTheGap = (point > gapL);                       //adjust if crosses the gap
     if (pastTheGap) point += gapSize();
 }
+
 //setPointR just sets relative to buffer, does not reflect screen
 void BufferManager::setPointR(int count){           //set the point relative
-    int newPoint = point;
-    if (crossesTheGap(count)) {
-        if (count < 0) newPoint -= gapSize();          //going to the left
-        else  newPoint += gapSize();
+    if (point + count >=0 && point + count <= end){
+        int newPoint = point;
+        if (crossesTheGap(count)) {
+            if (count < 0) newPoint -= gapSize();          //going to the left
+            else  newPoint += gapSize();
+        }
+        newPoint += count;
+        if (newPoint >= 0) point = newPoint;
     }
-    newPoint += count;
-    if (newPoint >= 0) point = newPoint;
 }
 
 int BufferManager::getPoint(){
     return point;
+}
+
+bool BufferManager::pointIsAtEnd(){
+    return (point == end);
 }
 
 void BufferManager::insert(string str){
@@ -140,11 +147,20 @@ void BufferManager::insert(string str){
 }
 
 void BufferManager::myDelete(int count){
-    checkGap();                                         //check the gap
-    if (count < 0)
-        point = gapL = gapL + count;                    //delete by moving markers
-    else
-        point = gapR = gapR + count;
+    if (((count < 0 && point >= abs(count)) ||
+         (count > 0 && point <= end + count)) && point <= end) {
+        checkGap();                                         //check the gap
+        if (usingEndMarker){
+            if (point + count <= gapR){
+                point = end = gapR = gapL = end + count - gapSize();
+            }
+            else point = end = end + count;
+        }
+        else if (count < 0)
+            point = gapL = gapL + count;                    //delete by moving markers
+        else
+            point = gapR = gapR + count;
+    }
 }
 
 void BufferManager::searchF(){
@@ -199,9 +215,6 @@ int BufferManager::getCol(int cols){
 
 
 
-
-//delete too far
-//return
 //search
 //control
 

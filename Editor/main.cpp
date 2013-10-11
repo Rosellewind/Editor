@@ -31,6 +31,24 @@ using namespace std;
 #define KEY_END		0550		/* end key */           //not avail on my mac
 #define KEY_EXIT	0551		/* exit key */          //not avail on my mac
 
+int stringSearch(const char *pattern, const char *text){
+	int i, j, lengthOfPattern= (int)strlen(pattern),lengthOfText= (int)strlen(text);
+    
+    //increments i and j on matches, j is reset and i adjusted if no match
+	for (i = 0, j = 0; j<strlen(pattern) && i<lengthOfText; i++,j++){
+        if (pattern[j] == '*') {
+            while (text[i+1] == pattern[j+1]) {i++; lengthOfPattern++;}
+            i--; lengthOfPattern--; continue;
+        }
+        
+        while(i<lengthOfText && pattern[j] != '?' && pattern[j] != '*' && text[i]!=pattern[j]){
+            if ((strlen(pattern) > 0 && pattern[j-1] == '*')) {
+                j--; lengthOfPattern++;}
+            else {i=i-j+1; j = 0;}
+        }
+	}
+	if(j==strlen(pattern)) return i-lengthOfPattern; else return -1;
+}
 
 string intToString(int i){//////////////
     string s;
@@ -39,7 +57,7 @@ string intToString(int i){//////////////
     s = out.str();
     return s;
 }
-void redisplay(BufferManager *buffer){
+void redisplay(BufferManager *buffer, bool isSearch){
     
     //display text
     clear();
@@ -48,23 +66,36 @@ void redisplay(BufferManager *buffer){
     addstr(left.c_str());
     addstr(right.c_str());
     
-    position pos = buffer->getPosition(COLS, LINES);
+    position pos;
+    if(isSearch){
+        pos.y = LINES - 1;
+        pos.x = 12;
+    }
+    else pos = buffer->getPosition(COLS, LINES);
 
+    //display search
+    if (isSearch){
+        move(LINES-1, 0);
+        string statusString = "Search for: ";
+        addstr(statusString.c_str());
+//        move(pos.y,pos.x);
+        refresh();
+    }
+    
     //display status
-    move(LINES-1, 0);
-    string statusString = "Curser: " + intToString(pos.y) + "," + intToString(pos.x) + "  ";
-    addstr(statusString.c_str());
-    addstr(buffer->varString().c_str());
-    
-    
-    move(pos.y,pos.x);
-    refresh();
-    
+    else{
+        move(LINES-1, 0);
+        string statusString = "Curser: " + intToString(pos.y) + "," + intToString(pos.x) + "  ";
+        addstr(statusString.c_str());
+        addstr(buffer->varString().c_str());
+        move(pos.y,pos.x);
+        refresh();
+    }
 }
 
 void run(BufferManager *buffer){
+    bool isSearch = false;
     int input = 0;
-    bool updateDisplay = false;
     while (input != 'q') {
         input = getch();
 //        buffer->insert(intToString(input));
@@ -73,39 +104,36 @@ void run(BufferManager *buffer){
         getyx(stdscr, y, x);
         switch (input) {
             case KEY_BACKSPACE:
-                if (x > 0) {
                     buffer->myDelete(-1);
-                    updateDisplay = true;}
                 break;
             case KEY_DC:
-                if (x >= 0) {
+                if (x >= 0)
                     buffer->myDelete(1);
-                    updateDisplay = true;}
                 break;
             case KEY_LEFT:
                     buffer->setPointR(-1);
-                    updateDisplay = true;
                 break;
             case KEY_RIGHT:
-                if (x < COLS-2){
                     buffer->setPointR(1);
-                    updateDisplay = true;}
                 break;
             case KEY_UP:{
                 position last;
                 do {
-                    buffer->setPointR(1);
+                    buffer->setPointR(-1);
                     last = buffer->getPosition(COLS, LINES);
-                } while (last.x != x);
-                updateDisplay = true;
+                } while (!(last.x ==0 && last.y == 0) &&
+                         ((last.x < x && last.y == y) ||
+                         (last.x > x && last.y == y-1)));
                 break;}
             case KEY_DOWN:{
                 position last;
                 do {
-                    buffer->setPointR(-1);
+                    buffer->setPointR(1);
                     last = buffer->getPosition(COLS, LINES);
-                } while (last.x != x);
-                updateDisplay = true;
+                } while (!buffer->pointIsAtEnd() &&
+                       ((last.x > x && last.y == y) ||
+                        (last.x < x && last.y == y+1)));
+                if (last.y > y + 1) buffer->setPointR(-1);
                 break;}
             case KEY_HOME:
                 move(y,0);
@@ -119,28 +147,29 @@ void run(BufferManager *buffer){
                  //                   string str = ".." + intToString(last.y) + "," + intToString(last.x) + "..";
                  //                   addstr(str.c_str());
                  //                 getch();
-                 
-                 case KEY_END:{///ctr home
-                 int y,x;
-                 getyx(stdscr, y, x);
-                 move(y,COLS);}
-                 break;
-                 case KEY_END:{////ctr end
-                 int y,x;
-                 getyx(stdscr, y, x);
-                 move(y,COLS);}
-                 break;
-                 case KEY_END:{//insert/overstrike toggle
-                 int y,x;
-                 getyx(stdscr, y, x);
-                 move(y,COLS);}
-                 break;
-                 case KEY_END:{//ctr F, prompt on the status line to search
-                 int y,x;
-                 getyx(stdscr, y, x);
-                 move(y,COLS);}
-                 break;
                  */
+
+             case 119:{///ctr home
+                 int y,x;
+                 getyx(stdscr, y, x);
+                 move(y,COLS);}
+                 break;
+             case 117:{////ctr end
+                 int y,x;
+                 getyx(stdscr, y, x);
+                 move(y,COLS);}
+                 break;
+             case 15:{//insert/overstrike toggle
+                 int y,x;
+                 getyx(stdscr, y, x);
+                 move(y,COLS);}
+                 break;
+             case 6:{//ctr F, prompt on the status line to search
+                 isSearch = true;
+                 int y,x;
+                 getyx(stdscr, y, x);
+                 move(y,COLS);}
+                 break;
             case KEY_EXIT:{//escape search
                 ;}
                 break;
@@ -148,13 +177,9 @@ void run(BufferManager *buffer){
                 char c = (char)input;
                 string str = string(&c, 1);
                 buffer->insert(str);
-                updateDisplay = true;
                 break;
         }
-        if (updateDisplay){
-            redisplay(buffer);
-            updateDisplay = false;
-        }
+            redisplay(buffer, isSearch);
     }
 }
 
@@ -170,7 +195,7 @@ int main(int argc, const char * argv[])
     cbreak();
     
     //display initial status
-    redisplay(buffer);
+    redisplay(buffer, false);
     
     //define key codes
 /*    define_key(key_ctrl_f, 300);
