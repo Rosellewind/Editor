@@ -12,90 +12,30 @@
 #include <stdlib.h>
 #include "ncurses.h"
 #include "BufferManager.h"
+#include "Display.h"
 using namespace std;
+/*
+/*
+#define KEY_CTRL_F      0006       /* control F key */
+#define KEY_ESC         0027      /* escape key */
+#define KEY_CTRL_O      0015      /* control O key */
+#define KEY_CTRL_END    0117   /* control end key */
+#define KEY_CTRL_HOME   0119  /* control home key */
+#define KEY_BACK        0127	/* backspace key */
+#define KEY_DELETE      8		/* delete key */
+#define KEY_LEFT_ARROW	0260		/* left-arrow key */
+#define KEY_RIGHT_ARROW 0261		/* right-arrow key */
+#define KEY_UP_ARROW    259		/* up-arrow key */
+#define KEY_DOWN_ARROW	258		/* down-arrow key */
+#define KEY_RETURN      10		/* enter/send key */
+#define KEY_HOME        0071		/* home key */
+#define KEY_END         0079		/* end key */
+#define KEY_EXIT        551		/* exit key */
+*/
 
-//custom defined keys
-#define KEY_CTRL_F  300     /* control F key */
-
-//these keys are redefined to make them compatible on my mac
-#define KEY_BACKSPACE	127		/* backspace key */
-#define KEY_DC		8		/* delete-line key */
-#define KEY_LEFT	260		/* left-arrow key */
-#define KEY_RIGHT	261		/* right-arrow key */
-#define KEY_UP		259		/* up-arrow key */
-#define KEY_DOWN	258		/* down-arrow key */
-#define KEY_ENTER	10		/* enter/send key */
-
-//these keys are not available on my mac, but are included here for documentation
-#define KEY_HOME	0406		/* home key */          //not avail on my mac
-#define KEY_END		0550		/* end key */           //not avail on my mac
-#define KEY_EXIT	0551		/* exit key */          //not avail on my mac
-
-int stringSearch(const char *pattern, const char *text){
-	int i, j, lengthOfPattern= (int)strlen(pattern),lengthOfText= (int)strlen(text);
-    
-    //increments i and j on matches, j is reset and i adjusted if no match
-	for (i = 0, j = 0; j<strlen(pattern) && i<lengthOfText; i++,j++){
-        if (pattern[j] == '*') {
-            while (text[i+1] == pattern[j+1]) {i++; lengthOfPattern++;}
-            i--; lengthOfPattern--; continue;
-        }
-        
-        while(i<lengthOfText && pattern[j] != '?' && pattern[j] != '*' && text[i]!=pattern[j]){
-            if ((strlen(pattern) > 0 && pattern[j-1] == '*')) {
-                j--; lengthOfPattern++;}
-            else {i=i-j+1; j = 0;}
-        }
-	}
-	if(j==strlen(pattern)) return i-lengthOfPattern; else return -1;
-}
-
-string intToString(int i){//////////////
-    string s;
-    stringstream out;
-    out << i;
-    s = out.str();
-    return s;
-}
-void redisplay(BufferManager *buffer, bool isSearch){
-    
-    //display text
-    clear();
-    string left = buffer->leftString();
-    string right = buffer->rightString();
-    addstr(left.c_str());
-    addstr(right.c_str());
-    
-    position pos;
-    if(isSearch){
-        pos.y = LINES - 1;
-        pos.x = 12;
-    }
-    else pos = buffer->getPosition(COLS, LINES);
-
-    //display search
-    if (isSearch){
-        move(LINES-1, 0);
-        string statusString = "Search for: ";
-        addstr(statusString.c_str());
-//        move(pos.y,pos.x);
-        refresh();
-    }
-    
-    //display status
-    else{
-        move(LINES-1, 0);
-        string statusString = "Curser: " + intToString(pos.y) + "," + intToString(pos.x) + "  ";
-        addstr(statusString.c_str());
-        addstr(buffer->varString().c_str());
-        move(pos.y,pos.x);
-        refresh();
-    }
-}
-
-void run(BufferManager *buffer){
-    bool isSearch = false;
-    int input = 0;
+void run(BufferManager *buffer, Display *display){
+    wchar_t input = 0;
+//    int input = 0;
     while (input != 'q') {
         input = getch();
 //        buffer->insert(intToString(input));
@@ -103,20 +43,20 @@ void run(BufferManager *buffer){
         int y,x;
         getyx(stdscr, y, x);
         switch (input) {
-            case KEY_BACKSPACE:
+            case KEY_BACK:
                     buffer->myDelete(-1);
                 break;
-            case KEY_DC:
+            case KEY_DELETE:
                 if (x >= 0)
                     buffer->myDelete(1);
                 break;
-            case KEY_LEFT:
+            case KEY_LEFT_ARROW:
                     buffer->setPointR(-1);
                 break;
-            case KEY_RIGHT:
+            case KEY_RIGHT_ARROW:
                     buffer->setPointR(1);
                 break;
-            case KEY_UP:{
+            case KEY_UP_ARROW:{
                 position last;
                 do {
                     buffer->setPointR(-1);
@@ -125,7 +65,7 @@ void run(BufferManager *buffer){
                          ((last.x < x && last.y == y) ||
                          (last.x > x && last.y == y-1)));
                 break;}
-            case KEY_DOWN:{
+            case KEY_DOWN_ARROW:{
                 position last;
                 do {
                     buffer->setPointR(1);
@@ -149,37 +89,35 @@ void run(BufferManager *buffer){
                  //                 getch();
                  */
 
-             case 119:{///ctr home
-                 int y,x;
-                 getyx(stdscr, y, x);
-                 move(y,COLS);}
-                 break;
-             case 117:{////ctr end
-                 int y,x;
-                 getyx(stdscr, y, x);
-                 move(y,COLS);}
-                 break;
-             case 15:{//insert/overstrike toggle
-                 int y,x;
-                 getyx(stdscr, y, x);
-                 move(y,COLS);}
-                 break;
-             case 6:{//ctr F, prompt on the status line to search
-                 isSearch = true;
-                 int y,x;
-                 getyx(stdscr, y, x);
-                 move(y,COLS);}
-                 break;
-            case KEY_EXIT:{//escape search
-                ;}
+            case KEY_CTRL_HOME:{///ctr home
+                int y,x;
+                getyx(stdscr, y, x);
+                move(y,COLS);}
+                break;
+            case KEY_CTRL_END:{////ctr end
+                int y,x;
+                getyx(stdscr, y, x);
+                move(y,COLS);}
+                break;
+            case KEY_CTRL_O:{//insert/overstrike toggle
+                int y,x;
+                getyx(stdscr, y, x);
+                move(y,COLS);}
+                break;
+            case KEY_CTRL_F://ctr F, prompt on the status line to search
+                display->startSearch(buffer->getPoint());
+                break;
+            case KEY_ESC://escape search
+                display->stopSearch();
                 break;
             default:
                 char c = (char)input;
                 string str = string(&c, 1);
-                buffer->insert(str);
+                if (display->isSearch)display->insert(str);
+                else buffer->insert(str);
                 break;
         }
-            redisplay(buffer, isSearch);
+            display->redisplay(buffer);
     }
 }
 
@@ -187,7 +125,8 @@ int main(int argc, const char * argv[])
 {
     //create buffer
     BufferManager *buffer = new BufferManager();
-
+    Display *display = new Display(buffer);
+    
     //setup curses
     initscr();
     noecho();
@@ -195,7 +134,7 @@ int main(int argc, const char * argv[])
     cbreak();
     
     //display initial status
-    redisplay(buffer, false);
+    display->redisplay(buffer);
     
     //define key codes
 /*    define_key(key_ctrl_f, 300);
@@ -203,7 +142,7 @@ int main(int argc, const char * argv[])
     define_key(<#const char *#>, <#int#>)
 */    
     //run
-    run(buffer);
+    run(buffer, display);
     
     //finish
     endwin( );

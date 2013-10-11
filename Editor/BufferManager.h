@@ -56,5 +56,6 @@ public:
     position getPosition(int cols, int rows);
     int getLine(int cols);
     int getCol(int cols);
+    char* getBuffer();
 };
 #endif /* defined(__Editor__BufferManager__) */

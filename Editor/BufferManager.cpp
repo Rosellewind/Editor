@@ -40,7 +40,6 @@ int BufferManager::crossesCarriageReturn(int count){
     return acc;
 }
 
-
 void BufferManager::addToTheGap(){                             //add to the gap from the end
 
     int count = GAP_BLOCK_SIZE;
@@ -57,6 +56,7 @@ void BufferManager::addToTheGap(){                             //add to the gap 
 int BufferManager::gapSize(){
     return gapR-gapL;
 }
+
 void BufferManager::shiftGap(int count, bool toTheLeft){       //shift gap
     if (toTheLeft){
         if (gapL == gapR) gapR = gapL = point;
@@ -212,12 +212,9 @@ int BufferManager::getCol(int cols){
     else return point % cols;
 }
 
-
-
-
-//search
-//control
-
+char* BufferManager::getBuffer(){
+    return buffer;
+}
 
 
 
