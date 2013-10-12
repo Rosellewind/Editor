@@ -14,49 +14,40 @@
 #include "BufferManager.h"
 #include "Display.h"
 using namespace std;
-/*
-/*
-#define KEY_CTRL_F      0006       /* control F key */
-#define KEY_ESC         0027      /* escape key */
-#define KEY_CTRL_O      0015      /* control O key */
-#define KEY_CTRL_END    0117   /* control end key */
-#define KEY_CTRL_HOME   0119  /* control home key */
-#define KEY_BACK        0127	/* backspace key */
-#define KEY_DELETE      8		/* delete key */
-#define KEY_LEFT_ARROW	0260		/* left-arrow key */
-#define KEY_RIGHT_ARROW 0261		/* right-arrow key */
-#define KEY_UP_ARROW    259		/* up-arrow key */
-#define KEY_DOWN_ARROW	258		/* down-arrow key */
-#define KEY_RETURN      10		/* enter/send key */
-#define KEY_HOME        0071		/* home key */
-#define KEY_END         0079		/* end key */
-#define KEY_EXIT        551		/* exit key */
-*/
+
+#define KEY_BACKSPACE	127		/* backspace key */
+#define KEY_CTRL_F      6       /* control F key */
+#define KEY_ESC         27      /* escape key */
+#define KEY_CTRL_A      1       /* control O key */
+#define KEY_CTRL_END    22      /* control end key */
+#define KEY_HOME        2       /* ctrl B */
+#define KEY_END         5       /* ctrl E */
+#define KEY_CTRL_END    12      /* ctrl L */
+#define KEY_CTRL_HOME   11      /* ctrl  K */
+#define KEY_QUIT        24      /* ctrl  X */
+
 
 void run(BufferManager *buffer, Display *display){
-    wchar_t input = 0;
-//    int input = 0;
-    while (input != 'q') {
+    int input = 0;
+    while (input != KEY_QUIT) {
         input = getch();
-//        buffer->insert(intToString(input));
-  //      input = getch();
         int y,x;
         getyx(stdscr, y, x);
         switch (input) {
-            case KEY_BACK:
-                    buffer->myDelete(-1);
+            case KEY_BACKSPACE:
+                buffer->myDelete(-1);
                 break;
-            case KEY_DELETE:
+            case KEY_DC:// fn del
                 if (x >= 0)
                     buffer->myDelete(1);
                 break;
-            case KEY_LEFT_ARROW:
-                    buffer->setPointR(-1);
+            case KEY_LEFT:
+                buffer->setPointR(-1);
                 break;
-            case KEY_RIGHT_ARROW:
-                    buffer->setPointR(1);
+            case KEY_RIGHT:
+                buffer->setPointR(1);
                 break;
-            case KEY_UP_ARROW:{
+            case KEY_UP:{
                 position last;
                 do {
                     buffer->setPointR(-1);
@@ -65,7 +56,7 @@ void run(BufferManager *buffer, Display *display){
                          ((last.x < x && last.y == y) ||
                          (last.x > x && last.y == y-1)));
                 break;}
-            case KEY_DOWN_ARROW:{
+            case KEY_DOWN:{
                 position last;
                 do {
                     buffer->setPointR(1);
@@ -75,34 +66,29 @@ void run(BufferManager *buffer, Display *display){
                         (last.x < x && last.y == y+1)));
                 if (last.y > y + 1) buffer->setPointR(-1);
                 break;}
-            case KEY_HOME:
-                move(y,0);
-                buffer->setPointR(x * -1);
+            case KEY_HOME:{//beginning of line  //ctrl B
+                position last = buffer->getPosition(COLS, LINES);
+                while (last.x != 0) {
+                    buffer->setPointR(-1);
+                    last = buffer->getPosition(COLS, LINES);}
+                break;}
+            case KEY_END:{//end of current line //ctrl E
+                position last = buffer->getPosition(COLS, LINES);
+                bool isAtEnd = false;
+                while (last.x != 0 && !isAtEnd) {
+                    buffer->setPointR(1);
+                    last = buffer->getPosition(COLS, LINES);
+                    isAtEnd = buffer->getEnd() == buffer->getPoint();}
+                if (!isAtEnd) buffer->setPointR(-1);
+                break;}
+            case KEY_CTRL_HOME://very beggining ctrl K
+                buffer->setPointA(0);
                 break;
-            case KEY_END:
-                move(y,COLS);
-                buffer->setPointR(COLS - x);
+            case KEY_CTRL_END://very end ctrl  L
+                buffer->setPointA(buffer->getEnd());
                 break;
-                /*
-                 //                   string str = ".." + intToString(last.y) + "," + intToString(last.x) + "..";
-                 //                   addstr(str.c_str());
-                 //                 getch();
-                 */
-
-            case KEY_CTRL_HOME:{///ctr home
-                int y,x;
-                getyx(stdscr, y, x);
-                move(y,COLS);}
-                break;
-            case KEY_CTRL_END:{////ctr end
-                int y,x;
-                getyx(stdscr, y, x);
-                move(y,COLS);}
-                break;
-            case KEY_CTRL_O:{//insert/overstrike toggle
-                int y,x;
-                getyx(stdscr, y, x);
-                move(y,COLS);}
+            case KEY_CTRL_A://insert/overstrike toggle
+                buffer->toggleOverstrike();
                 break;
             case KEY_CTRL_F://ctr F, prompt on the status line to search
                 display->startSearch(buffer->getPoint());
@@ -136,11 +122,6 @@ int main(int argc, const char * argv[])
     //display initial status
     display->redisplay(buffer);
     
-    //define key codes
-/*    define_key(key_ctrl_f, 300);
-    define_key("\eO", 720);
-    define_key(<#const char *#>, <#int#>)
-*/    
     //run
     run(buffer, display);
     

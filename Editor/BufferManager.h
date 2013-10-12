@@ -57,5 +57,8 @@ public:
     int getLine(int cols);
     int getCol(int cols);
     char* getBuffer();
+    void toggleOverstrike();
+    bool getOverstrike();
+    int getEnd();
 };
 #endif /* defined(__Editor__BufferManager__) */

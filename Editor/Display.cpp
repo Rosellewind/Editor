@@ -109,7 +109,9 @@ void Display::redisplay(BufferManager *buffer){
     //display status
     else{
         move(LINES-1, 0);
-        string statusString = "Curser: " + intToString(pos.y) + "," + intToString(pos.x) + "  ";
+        string statusString = "";
+        if (buffer->getOverstrike()) statusString = "OVERSTRIKE  ";
+        statusString += "Curser: " + intToString(pos.y) + "," + intToString(pos.x) + "  ";
         addstr(statusString.c_str());
         addstr(buffer->varString().c_str());
         move(pos.y,pos.x);

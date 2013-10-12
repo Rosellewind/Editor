@@ -132,23 +132,37 @@ bool BufferManager::pointIsAtEnd(){
 }
 
 void BufferManager::insert(string str){
-    checkGap();                                         //check the gap
-    if (!usingEndMarker && gapSize() < str.length()) addToTheGap();
-    for (int i = 0; i < str.length(); i++) {            //insert char and update
-        buffer[point] = str[i];
-        point++;
-        if (usingEndMarker) {
-            if (end == gapL)
-            {gapL++; gapR++;}
-            end++;
+    if (overstrike){
+        for (int i = 0; i < str.length(); i++) {            //insert char and update
+            if (crossesTheGap(1)) point += gapSize();
+            buffer[point] = str[i];
+            if (point == end) end++;
+            point++;
         }
-        else gapL++;
     }
+    else {
+        checkGap();                                         //check the gap
+        if (!usingEndMarker && gapSize() < str.length()) addToTheGap();
+        for (int i = 0; i < str.length(); i++) {            //insert char and update
+            buffer[point] = str[i];
+            point++;
+            if (usingEndMarker) {
+                if (end == gapL)
+                {gapL++; gapR++;}
+                end++;
+            }
+            else gapL++;
+        }
+    }
+
 }
 
 void BufferManager::myDelete(int count){
-    if (((count < 0 && point >= abs(count)) ||
-         (count > 0 && point <= end + count)) && point <= end) {
+//bool crosses = crossesTheGap(count);
+    if (((count < 0 && point + count >= 0) ||
+         ((count > 0 && point + count <= end) &&
+          !(count > 0 && point == gapL && gapR == end)))
+        && point <= end) {
         checkGap();                                         //check the gap
         if (usingEndMarker){
             if (point + count <= gapR){
@@ -161,7 +175,7 @@ void BufferManager::myDelete(int count){
         else
             point = gapR = gapR + count;
     }
-}
+}//gapR and end are the same,
 
 void BufferManager::searchF(){
     
@@ -188,12 +202,13 @@ string BufferManager::varString(){
 position BufferManager::getPosition(int cols, int rows){
     position pos;
     pos.x = pos.y = 0;
+    if (point == gapR) point = gapL;
     for (int i = 0; i < point; i++) {
-        bool pastTheGap = (i == gapL);       //adjust if crosses the gap
-        if (pastTheGap) i += gapSize();
+        bool atTheGap = (i == gapL);       //adjust if crosses the gap
+        if (atTheGap) i += gapSize();
         int c = buffer[i];
-        if (c == 10){pos.x = 0; pos.y++;}
-        else if (pos.x == cols) {pos.x = 1; pos.y++;}
+        if (c == 10){pos.x = 0; pos.y++;}               //return key
+        else if (pos.x == cols) {pos.x = 1; pos.y++;}   //end of screen line
         else {pos.x++;}
     }
     return pos;
@@ -216,13 +231,23 @@ char* BufferManager::getBuffer(){
     return buffer;
 }
 
+void BufferManager::toggleOverstrike(){
+    overstrike = !overstrike;
+}
+
+bool BufferManager::getOverstrike(){
+    return overstrike;
+}
+
+int BufferManager::getEnd(){
+    return end;
+}
 
 
 
 
 
-
-
+//fn delete to the right rightmost
 
 
 
