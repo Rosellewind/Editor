@@ -38,8 +38,9 @@ class BufferManager{
     int gapSize();
     void shiftGap(int count, bool toTheLeft);
     void checkGap();
-    void setI(int &i, int count);
-
+    
+    void setI(int &i, int count);///
+    bool crossesI(int i, int count);////
     
 public:
     BufferManager();
@@ -49,6 +50,9 @@ public:
     void myDelete(int count);
     int searchF(const char *pattern, int searchPoint);
     
+    void adjUpIfPastGap(int &pt);
+    void adjDownIfPastGap(int &pt);
+    string bufferString();
     string leftString();
     string rightString();
     string varString();
