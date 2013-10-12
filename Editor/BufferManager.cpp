@@ -100,10 +100,12 @@ void BufferManager::adjDownIfPastGap(int &pt){
     if (pastTheGap) pt -= gapSize();
 }
 
-void BufferManager::setPointA(int location){                //set the point to absolute location
+void BufferManager::setPointA(int location, bool adjust){                //set the point to absolute location
     point = location;//////////
-    bool pastTheGap = (point > gapL);                       //adjust if crosses the gap
-    if (pastTheGap) point += gapSize();
+    if (adjust) {
+        bool pastTheGap = (point > gapL);                       //adjust if crosses the gap
+        if (pastTheGap) point += gapSize();
+    }
 }
 
 void BufferManager::setPointR(int count){                   //set the point relative to where it is now
@@ -188,7 +190,7 @@ void BufferManager::setI(int &i, int count){
 }
 int BufferManager::searchF(const char *pattern, int searchPoint){
     const char *text = bufferString().c_str();              //set the text
-//    if (searchPoint > gapL) searchPoint -= gapSize();       //adjust searchPoint
+    if (searchPoint > gapL) searchPoint -= gapSize();       //adjust searchPoint
 	int i, j, lengthOfPattern= (int)strlen(pattern),lengthOfText= (int)strlen(text);
     
     //increments i and j on matches, j is reset and i adjusted if no match

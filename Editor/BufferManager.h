@@ -44,7 +44,7 @@ class BufferManager{
     
 public:
     BufferManager();
-    void setPointA(int index);
+    void setPointA(int location, bool adjust);
     void setPointR(int count);
     void insert(string str);
     void myDelete(int count);

@@ -20,7 +20,6 @@ Display::Display(BufferManager *bufferManager){             //initialize class i
 void Display::startSearch(int point){                       //called to start a search
     isSearch = true;
     searchPoint = point;
-    buffer->adjDownIfPastGap(point);
 }
 
 void Display::stopSearch(){                                 //called to stop a search
@@ -40,13 +39,9 @@ void Display::insert(string str){                           //insert into search
     for (int i = 0; i < str.length(); i++){
         if (str[i] == 10){                             //enter
             int index = buffer->searchF(searchWord.c_str(), searchPoint);
-            if (index == -1){
-                buffer->adjDownIfPastGap(searchPoint);
-                index = searchPoint;
-            }
-            else {buffer->adjDownIfPastGap(index);
-                resultTrue = true;}
-            buffer->setPointA(index);
+            if (index == -1) index = searchPoint;
+            else resultTrue = true;
+            buffer->setPointA(index, false);
             stopSearch();
             displayResult = true;
         }

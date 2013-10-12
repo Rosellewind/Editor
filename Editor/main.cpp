@@ -79,10 +79,10 @@ void run(BufferManager *buffer, Display *display){
                 if (!isAtEnd) buffer->setPointR(-1);
                 break;}
             case KEY_CTRL_HOME://very beggining ctrl K
-                buffer->setPointA(0);
+                buffer->setPointA(0, false);
                 break;
             case KEY_CTRL_END://very end ctrl  L
-                buffer->setPointA(buffer->getEnd());
+                buffer->setPointA(buffer->getEnd(), true);
                 break;
             case KEY_CTRL_A://insert/overstrike toggle
                 buffer->toggleOverstrike();
