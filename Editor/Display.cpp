@@ -27,7 +27,7 @@ void Display::stopSearch(){                                 //called to stop a s
     searchWord = "";
 }
 
-string Display::intToString(int i){
+string Display::intToString(int i){                         //makes string out of integer
     string s;
     stringstream out;
     out << i;
@@ -37,11 +37,16 @@ string Display::intToString(int i){
 
 void Display::insert(string str){                           //insert into search string
     for (int i = 0; i < str.length(); i++){
-        if (str[i] == 10){                             //enter
+        if (str[i] == 10){                                  //if enter key, proceed with search
             int index = buffer->searchF(searchWord.c_str(), searchPoint);
-            if (index == -1) index = searchPoint;
-            else resultTrue = true;
-            buffer->setPointA(index, false);
+            if (index == -1){                               //if search failed,
+                index = searchPoint;
+            //    buffer->setPointA(index, false);
+            }
+            else{                                           //
+                resultTrue = true;
+                buffer->setPointA(index, false);
+            }
             stopSearch();
             displayResult = true;
         }
@@ -56,13 +61,8 @@ void Display::redisplay(BufferManager *buffer){             //update the display
     clear();
     string bufferString = buffer->bufferString();
     addstr(bufferString.c_str());
-    /*
-    string left = buffer->leftString();
-    string right = buffer->rightString();
-    addstr(left.c_str());
-    addstr(right.c_str());
-    */
     
+    //position cursor
     position pos;
     if(isSearch){
         pos.y = LINES - 1;
@@ -83,7 +83,7 @@ void Display::redisplay(BufferManager *buffer){             //update the display
     //display search
     else if (isSearch){
         move(LINES-1, 0);
-        string statusString = "Search for: ";
+        string statusString = "  Search for: ";
         addstr(statusString.c_str());
         addstr(searchWord.c_str());
         move(LINES - 1,(int)statusString.length() + (int)searchWord.length());

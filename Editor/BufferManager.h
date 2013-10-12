@@ -39,9 +39,6 @@ class BufferManager{
     void shiftGap(int count, bool toTheLeft);
     void checkGap();
     
-    void setI(int &i, int count);///
-    bool crossesI(int i, int count);////
-    
 public:
     BufferManager();
     void setPointA(int location, bool adjust);
@@ -49,12 +46,8 @@ public:
     void insert(string str);
     void myDelete(int count);
     int searchF(const char *pattern, int searchPoint);
-    
-    void adjUpIfPastGap(int &pt);
-    void adjDownIfPastGap(int &pt);
+
     string bufferString();
-    string leftString();
-    string rightString();
     string varString();
     
     position getCurserPosition(int cols, int rows);

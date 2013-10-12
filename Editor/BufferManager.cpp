@@ -90,16 +90,6 @@ BufferManager::BufferManager(){                             //initialize buffer 
     buffer = createBuffer();
 }
 
-void BufferManager::adjUpIfPastGap(int &pt){
-    bool pastTheGap = (pt > gapL);                       //adjust if crosses the gap
-    if (pastTheGap) pt += gapSize();
-}
-
-void BufferManager::adjDownIfPastGap(int &pt){
-    bool pastTheGap = (pt > gapL);                       //adjust if crosses the gap
-    if (pastTheGap) pt -= gapSize();
-}
-
 void BufferManager::setPointA(int location, bool adjust){                //set the point to absolute location
     point = location;//////////
     if (adjust) {
@@ -165,32 +155,11 @@ void BufferManager::myDelete(int count){                    //delete count numbe
             point = gapR = gapR + count;
     }
 }
-bool BufferManager::crossesI(int i, int count){
-    //see if it crosses
-    int total = i + count;
-    bool cross = false;
-    if (i == gapL || i == gapL - 1) cross = (count > 0);
-    else if (i == gapR) cross = (count < 0);
-    else if((i < gapL && total >= gapR)||
-            (i > gapR && total < gapL)) cross = true;
-    return cross;
-}
 
-void BufferManager::setI(int &i, int count){
-    if (point + count >=0 && point + count <= end){
-        int newPoint = i;
-        if (crossesI(i,count)) {
-            bool movingLeft = (count < 0);
-            if (movingLeft) newPoint -= gapSize();
-            else  newPoint += gapSize();
-        }
-        newPoint += count;
-        if (newPoint >= 0) point = newPoint;
-    }
-}
 int BufferManager::searchF(const char *pattern, int searchPoint){
     const char *text = bufferString().c_str();              //set the text
-    if (searchPoint > gapL) searchPoint -= gapSize();       //adjust searchPoint
+    bool acrossGap = false;
+    if (searchPoint > gapL){ searchPoint -= gapSize(); acrossGap = true;}      //adjust searchPoint
 	int i, j, lengthOfPattern= (int)strlen(pattern),lengthOfText= (int)strlen(text);
     
     //increments i and j on matches, j is reset and i adjusted if no match
@@ -206,6 +175,8 @@ int BufferManager::searchF(const char *pattern, int searchPoint){
             else {i=i-j+1; j = 0;}
         }
 	}
+    if (acrossGap || (searchPoint <= gapL && i > gapL))////////
+        i += gapSize();
 	if(j==strlen(pattern)) return i; else return -1;
 }
 
@@ -216,18 +187,6 @@ string BufferManager::bufferString(){                         //returns string t
     int sizeRight = end - gapR;
     string strR(&buffer[gapR], sizeRight);
     return strL + strR;
-}
-
-string BufferManager::leftString(){                         //returns string to the left of the gap
-    int sizeLeft = gapL;
-    string str(buffer, sizeLeft);
-    return str;
-}
-
-string BufferManager::rightString(){                        //returns string to the right of the gap
-    int sizeRight = end - gapR;
-    string str(&buffer[gapR], sizeRight);
-    return str;
 }
 
 string BufferManager::varString(){                          //returns variable information string
