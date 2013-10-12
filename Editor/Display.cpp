@@ -39,16 +39,13 @@ void Display::insert(string str){                           //insert into search
     for (int i = 0; i < str.length(); i++){
         if (str[i] == 10){                                  //if enter key, proceed with search
             int index = buffer->searchF(searchWord.c_str(), searchPoint);
-            if (index == -1){                               //if search failed,
-                index = searchPoint;
-            //    buffer->setPointA(index, false);
-            }
-            else{                                           //
+            if (index != -1){                               //if search succeeded
                 resultTrue = true;
                 buffer->setPointA(index, false);
             }
             stopSearch();
             displayResult = true;
+            break;// not needed as 'enter' will always be the last in the string
         }
         else
             searchWord += str[i];
@@ -83,7 +80,7 @@ void Display::redisplay(BufferManager *buffer){             //update the display
     //display search
     else if (isSearch){
         move(LINES-1, 0);
-        string statusString = "  Search for: ";
+        string statusString = "Search for: ";
         addstr(statusString.c_str());
         addstr(searchWord.c_str());
         move(LINES - 1,(int)statusString.length() + (int)searchWord.length());

@@ -159,7 +159,7 @@ void BufferManager::myDelete(int count){                    //delete count numbe
 int BufferManager::searchF(const char *pattern, int searchPoint){
     const char *text = bufferString().c_str();              //set the text
     bool acrossGap = false;
-    if (searchPoint > gapL){ searchPoint -= gapSize(); acrossGap = true;}      //adjust searchPoint
+    if (searchPoint > gapL){ searchPoint -= gapSize(); acrossGap = true;}    //adjust searchPoint if needed
 	int i, j, lengthOfPattern= (int)strlen(pattern),lengthOfText= (int)strlen(text);
     
     //increments i and j on matches, j is reset and i adjusted if no match
@@ -175,7 +175,7 @@ int BufferManager::searchF(const char *pattern, int searchPoint){
             else {i=i-j+1; j = 0;}
         }
 	}
-    if (acrossGap || (searchPoint <= gapL && i > gapL))////////
+    if (acrossGap || (searchPoint <= gapL && i > gapL))     //adjust if there is a gap
         i += gapSize();
 	if(j==strlen(pattern)) return i; else return -1;
 }

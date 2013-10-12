@@ -10,7 +10,7 @@
 #define __Editor__Display__
 
 #include <iostream>
-#include "ncurses.h"
+#include "curses.h"
 #include <string>
 #include "BufferManager.h"
 

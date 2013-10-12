@@ -5,7 +5,12 @@
 //  Created by Roselle Milvich on 10/3/13.
 //  Copyright (c) 2013 Roselle Milvich. All rights reserved.
 //
-
+/*
+ g++ -o edit main.cpp BufferManager.cpp Display.cpp -lcurses
+ this is a text editor that uses that gap method. It supports entering text, delete(fn-delete) and backspace, moving with arrows and ctrl key combinations, overstrike mode, and search forward from the curser
+ (supports wildcard ? matches one character and * matches zero or more characters)
+ 
+ */
 
 #include <iostream>
 #include "curses.h"
@@ -13,15 +18,15 @@
 #include "Display.h"
 using namespace std;
 
-#define KEY_BACKSPACE	127		/* backspace key */
-#define KEY_CTRL_F      6       /* control F key */
-#define KEY_ESC         27      /* escape key */
-#define KEY_CTRL_A      1       /* control O key */
-#define KEY_HOME        2       /* ctrl B */
-#define KEY_END         5       /* ctrl E */
-#define KEY_CTRL_END    12      /* ctrl L */
-#define KEY_CTRL_HOME   11      /* ctrl  K */
-#define KEY_QUIT        24      /* ctrl  X */
+#define KEY_BACKSPACE	127		/* backspace key    delete to left */
+#define KEY_SEARCH_F    6       /* ctrl F key       search forward */
+#define KEY_ESC         27      /* escape key       exit the search */
+#define KEY_OVERSTRIKE  1       /* ctrl A key       overstrike toggle */
+#define KEY_HOME        2       /* ctrl B key       go to beginning of line */
+#define KEY_END         5       /* ctrl E key       go to the end of the line */
+#define KEY_VERY_HOME   11      /* ctrl K key       go to the very end*/
+#define KEY_VERY_END    12      /* ctrl L key       go to the very beginning */
+#define KEY_QUIT        24      /* ctrl X key       quit the editor */
 
 
 void run(BufferManager *buffer, Display *display){
@@ -78,26 +83,27 @@ void run(BufferManager *buffer, Display *display){
                     isAtEnd = buffer->getEnd() == buffer->getPoint();}
                 if (!isAtEnd) buffer->setPointR(-1);
                 break;}
-            case KEY_CTRL_HOME://very beggining ctrl K
+            case KEY_VERY_HOME://very beggining ctrl K
                 buffer->setPointA(0, false);
                 break;
-            case KEY_CTRL_END://very end ctrl  L
+            case KEY_VERY_END://very end ctrl  L
                 buffer->setPointA(buffer->getEnd(), true);
                 break;
-            case KEY_CTRL_A://insert/overstrike toggle
+            case KEY_OVERSTRIKE://insert/overstrike toggle
                 buffer->toggleOverstrike();
                 break;
-            case KEY_CTRL_F://ctr F, prompt on the status line to search
+            case KEY_SEARCH_F://ctr F, prompt on the status line to search
                 display->startSearch(buffer->getPoint());
                 break;
             case KEY_ESC://escape search
                 display->stopSearch();
                 break;
             default:
-                char c = (char)input;
-                string str = string(&c, 1);
-                if (display->isSearch)display->insert(str);
-                else buffer->insert(str);
+                if ((input > 31 && input < 127) || input == 10){
+                    char c = (char)input;
+                    string str = string(&c, 1);
+                    if (display->isSearch)display->insert(str);
+                    else buffer->insert(str);}
                 break;
         }
             display->redisplay(buffer);
