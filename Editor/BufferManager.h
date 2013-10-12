@@ -32,30 +32,30 @@ class BufferManager{
     bool usingEndMarker;
     
     char* createBuffer();
+    string intToString(int i);
     bool crossesTheGap(int count);
-    int crossesCarriageReturn(int count);
     void addToTheGap();
     int gapSize();
     void shiftGap(int count, bool toTheLeft);
     void checkGap();
+    void setI(int &i, int count);
 
     
 public:
     BufferManager();
-    string intToString(int i);
     void setPointA(int index);
     void setPointR(int count);
-    int getPoint();
-    bool pointIsAtEnd();
     void insert(string str);
     void myDelete(int count);
-    void searchF();
+    int searchF(const char *pattern, int searchPoint);
+    
     string leftString();
     string rightString();
     string varString();
-    position getPosition(int cols, int rows);
-    int getLine(int cols);
-    int getCol(int cols);
+    
+    position getCurserPosition(int cols, int rows);
+    int getPoint();
+    bool pointIsAtEnd();
     char* getBuffer();
     void toggleOverstrike();
     bool getOverstrike();

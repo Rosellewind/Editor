@@ -13,15 +13,14 @@
 #include "ncurses.h"
 #include <string>
 #include "BufferManager.h"
+
 class Display {
     string searchWord;
     BufferManager *buffer;
-    int stringSearch(const char *pattern, const char *text);
     string intToString(int i);
     int searchPoint;
     bool displayResult;
     bool resultTrue;
-
     
 public:
     bool isSearch;

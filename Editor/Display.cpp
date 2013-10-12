@@ -10,24 +10,24 @@
 #include <sstream>
 
 
-Display::Display(BufferManager *bufferManager){
+Display::Display(BufferManager *bufferManager){             //initialize class instance
     searchWord = "";
     isSearch = displayResult = resultTrue = false;
     buffer = bufferManager;
     searchPoint = 0;
 }
 
-void Display::startSearch(int point){
+void Display::startSearch(int point){                       //called to start a search
     isSearch = true;
     searchPoint = point;
 }
 
-void Display::stopSearch(){
+void Display::stopSearch(){                                 //called to stop a search
     isSearch = false;
     searchWord = "";
 }
 
-string Display::intToString(int i){//////////////
+string Display::intToString(int i){
     string s;
     stringstream out;
     out << i;
@@ -35,31 +35,11 @@ string Display::intToString(int i){//////////////
     return s;
 }
 
-int Display::stringSearch(const char *pattern, const char *text){
-	int i, j, lengthOfPattern= (int)strlen(pattern),lengthOfText= (int)strlen(text);
-    
-    //increments i and j on matches, j is reset and i adjusted if no match
-	for (i = searchPoint, j = 0; j<strlen(pattern) && i<lengthOfText; i++,j++){
-        if (pattern[j] == '*') {
-            while (text[i+1] == pattern[j+1]) {i++; lengthOfPattern++;}
-            i--; lengthOfPattern--; continue;
-        }
-        
-        while(i<lengthOfText && pattern[j] != '?' && pattern[j] != '*' && text[i]!=pattern[j]){
-            if ((strlen(pattern) > 0 && pattern[j-1] == '*')) {
-                j--; lengthOfPattern++;}
-            else {i=i-j+1; j = 0;}
-        }
-	}
-	if(j==strlen(pattern)) return i-lengthOfPattern; else return -1;
-}
-
-void Display::insert(string str){
+void Display::insert(string str){                           //insert into search string
     for (int i = 0; i < str.length(); i++){
         if (str[i] == 10){                             //enter
-            int index = stringSearch(searchWord.c_str(), buffer->getBuffer());
-            if (index == -1)
-                index = searchPoint;
+            int index = buffer->searchF(searchWord.c_str(), searchPoint);
+            if (index == -1) index = searchPoint;
             else resultTrue = true;
             buffer->setPointA(index);
             stopSearch();
@@ -70,7 +50,7 @@ void Display::insert(string str){
     }
 }
 
-void Display::redisplay(BufferManager *buffer){
+void Display::redisplay(BufferManager *buffer){             //update the display
     
     //display text
     clear();
@@ -84,7 +64,7 @@ void Display::redisplay(BufferManager *buffer){
         pos.y = LINES - 1;
         pos.x = 12;
     }
-    else pos = buffer->getPosition(COLS, LINES);
+    else pos = buffer->getCurserPosition(COLS, LINES);
     
     //display search result
     if (displayResult){
